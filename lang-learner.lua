@@ -20,6 +20,8 @@
 -- the License, or (at your option) any later version.
 --
 
+-- print("LOADED")
+
 local utils = require("mp.utils")
 local options = require("mp.options")
 
@@ -49,7 +51,7 @@ local o = {
   key_store = "F6",
   key_script = "F7",
 }
-options.read_options(o)
+options.read_options(o, "lang-learner")
 
 local auto_ab_loop_sub = false
 local is_learn_lang = false

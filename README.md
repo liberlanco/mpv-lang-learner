@@ -96,10 +96,14 @@ Follow MPV instructions to install. (usually `.lua` should go into
 
 ## Possible problems
 
-* doesn't load - check script path. Try to call `mpv` from shell, some
-  frontends known to disable script loading. Add some `print("123")`
-  into begining of the script as sign that it's loaded.
-* doesn't work or suddenly stops working.  - run in terminal, try to
-  reproduce, look in terminal for possible stack traces. If script
-  crashes, then MPV disables it and disables all bindings.
-* configuration is not loaded. Check paths,
+* **doesn't load** Check script path. Try to call `mpv` from shell,
+  some frontends known to disable script loading. Uncomment line
+  `print("LOADED")` at the begining of the script as a sign that it's
+  loaded for easier debugging.
+* **suddenly stops working.** Run in terminal, try to reproduce, look
+  in terminal for possible stack traces. If script crashes, then MPV
+  disables it and disables all bindings.
+* **configuration option doesn't work.** Run in console and watch for
+  warnings about unknown options. Add wrong option (`abc=123`) in
+  config file, and start mpv. If there is no warning, then MPV doesn't
+  load config file at all. Check paths and naming.

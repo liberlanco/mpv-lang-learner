@@ -32,20 +32,19 @@ Scripts to tune MPV into the video player for language learners.
 ## How to use
 
 ### Train READING
-* Use `b` to switch to language you learn. Press same key `b` to switch
-  lang you know and back.
+* Use `b` to cycle between language you know and language you learn.
 * If there are several languages you know, use `B` to cycle between them.
-  After that `b` will switch to selected language.
-* `Ctrl+left` / `Ctrl+right` (native bindings) to find subtitles if they
-  disappeared.
+  After that `b` will use selected language.
+* `Ctrl+left` / `Ctrl+right` (native bindings) to find needed subtitle.
+  (notice it work well only for subtitles that were already shown)
 * Use `F1` or `F2` to quickly lookup current text in dictionaries or
   transators. It will also pause the video.  May be default bindings
   `f` (full screen) and `T` (on top) will be useful when working with
-  many windows.
-* Use `F6` to save current subtitle in `to_learn`. It's for good phrases
-  or frequent words you want to learn better.
-* You can prepare a script and setup it for `F7` to automatically create
-  flash cards for instance.
+  multiple windows.
+* Use `F6` to save current subtitle in `to_learn` folder. It's for
+  good phrases or frequent words you want to learn separately.
+* You can prepare a script and setup it for `F7` to (for example)
+  automatically create flash cards in Anki.
 
 (tip: it also dumps current subtitile into console, for the case if you
 want to copy-paste something!)
@@ -98,9 +97,9 @@ Follow MPV instructions to install. (usually `.lua` should go into
 ## Possible problems
 
 * doesn't load - check script path. Try to call `mpv` from shell, some
-frontends known to disable script loading. Add some `print("123")` into
-begining of the script as sign that it's loaded.
+  frontends known to disable script loading. Add some `print("123")`
+  into begining of the script as sign that it's loaded.
 * doesn't work or suddenly stops working.  - run in terminal, try to
-reproduce, look in terminal for possible stack traces. If script
-crashes, then MPV disables it and disables all bindings.
+  reproduce, look in terminal for possible stack traces. If script
+  crashes, then MPV disables it and disables all bindings.
 * configuration is not loaded. Check paths,

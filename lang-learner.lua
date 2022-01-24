@@ -87,7 +87,10 @@ function do_ab_loop_sub()
     clear_ab_loop()
     mp.osd_message("Clear AB loop", 0.5)
   else
-    if get_sub() == nil then return; end
+    if get_sub() == nil then
+      mp.osd_message("no cur sub", 0.3)
+      return;
+    end
     set_ab_loop()
     mp.osd_message("AB-Loop subtitle", 0.5)
   end
@@ -109,7 +112,10 @@ function do_open_in_url(tag)
   if o[tag] == "" then return; end
 
   local sub = get_sub()
-  if sub == nil then return; end
+  if sub == nil then
+    mp.osd_message('no cur sub', 0.3)
+    return;
+  end
 
   local url = string.format(o[tag], sub['text'])
   -- print("Open URL: " .. url)
@@ -118,25 +124,36 @@ function do_open_in_url(tag)
 end
 
 function do_store(tag)
-  local sub = get_sub()
-  if sub == nil then return; end
-  sub['source'] = mp.get_property('filename')
+  local range = get_sub() or get_ab_loop()
+  if range == nil then
+    mp.osd_message('no cur sub or AB loop', 0.3)
+    return;
+  end
+  range['source'] = mp.get_property('filename')
 
   local dir = o['store_dir']
   if dir == "" or dir == nil then return; end
 
-  mp.commandv("run", "mkdir", "-p", dir)
+  ensure_store_dir(dir)
 
   local filename = string.format("%s/%s-sub", dir, os.date("!%Y%m%dT%H%M%S"))
-  save_sub(filename .. '.txt', sub)
-  save_json(filename .. '.json', sub)
-  save_audio(filename .. '.mp3', sub)
+  save_sub(filename .. '.txt', range)
+  save_json(filename .. '.json', range)
+  save_audio(filename .. '.mp3', range)
+  save_screenshot(filename .. '.jpg', range)
+
+  mp.osd_message('Store txt, mp3, jpg for current ' .. range['type'] ..
+                 ' into ' .. dir)
 end
 
 function do_script(tag)
   local sub = get_sub()
-  if sub == nil then return; end
+  if sub == nil then
+    mp.osd_message('no cur sub', 0.3)
+    return
+  end
 
+  mp.osd_message('Run ext script on current sub')
   call_ext_script(sub)
 end
 
@@ -220,6 +237,19 @@ function prepare_lang_tag(tag)
   data[tag] = res
 end
 
+function get_ab_loop()
+  local res = {}
+  res['type'] = 'ab-loop'
+  res['start'] = mp.get_property("ab-loop-a")
+  res['end'] = mp.get_property("ab-loop-b")
+  if res['start'] == "" or res['start'] == nil or res['start'] == 'no' then
+    return nil
+  end
+
+  res['text'] = 'AB loop'
+  return res
+end
+
 function clear_ab_loop()
     mp.set_property("ab-loop-a", "no")
     mp.set_property("ab-loop-b", "no")
@@ -241,6 +271,7 @@ function set_slang(tag)
 
   if lang ~= nil then
     mp.set_property('sub', tonumber(data['by_lang'][lang]['id']))
+    mp.osd_message('Quick sub: ' .. data['by_lang'][lang]['lang'], 0.4)
   else
     mp.osd_message('Cant find sub with lang: ' .. o[tag])
   end
@@ -258,6 +289,7 @@ end
 
 function get_sub()
   local res = {}
+  res['type'] = 'sub'
   res['text'] = mp.get_property("sub-text")
   if res['text'] == "" or res['text'] == nil then return nil; end
 
@@ -315,6 +347,25 @@ function save_audio(filename, sub)
   print("saved audion to " .. filename)
 end
 
+function save_screenshot(filename, sub)
+  local time = ((sub['end'] - sub['start']) / 2) + sub['start']
+
+  local ffmpeg = get_ffmpeg()
+  if ffmpeg == nil then
+    print("Can't save audio: no ffmpeg")
+    return
+  end
+
+  mp.commandv("run", ffmpeg, "-y",
+              "-loglevel", "error",
+              "-i", sub['source'],
+              "-ss", sub['start'], "-vframes", "1",
+              "-q:v", "2",
+              filename)
+
+  print("saved screenshot to " .. filename)
+end
+
 local ffmpeg_path = nil
 function get_ffmpeg()
   if ffmpeg_path == nil then
@@ -323,4 +374,20 @@ function get_ffmpeg()
     proc:close()
   end
   return ffmpeg_path
+end
+
+function ensure_store_dir(dir)
+  -- Sync call to mkdir because we need to make sure
+  -- it exists before saving files
+  local r = mp.command_native({
+    name = "subprocess",
+    playback_only = false,
+    capture_stdout = true,
+    args = {"mkdir", "-p", dir}
+  })
+  -- if r.status == 0 then
+  --   mp.osd_message('Created dir ' .. dir, 0.3)
+  -- else
+  --   print(r)
+  -- end
 end

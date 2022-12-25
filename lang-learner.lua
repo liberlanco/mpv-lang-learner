@@ -24,6 +24,7 @@
 
 local utils = require("mp.utils")
 local options = require("mp.options")
+local msg = require("mp.msg")
 
 local o = {
   trace_subs = true,
@@ -51,11 +52,28 @@ local o = {
   key_store = "F6",
   key_script = "F7",
 }
-options.read_options(o, "lang-learner")
+
+function on_update(updated)
+  -- nothing to do exactly, options table is already updated
+  -- so we just dump opions
+  msg.log('v', 'Config updated')
+  dump_config()
+end
+options.read_options(o, "lang-learner", on_update)
 
 local auto_ab_loop_sub = false
 local is_learn_lang = false
 local data = nil
+
+function dump_config()
+  msg.log('v', 'Current config:')
+  local keys = {}
+  for key in pairs(o) do table.insert(keys, key) end
+  table.sort(keys)
+  for i, key in pairs(keys) do
+    msg.log('v', key .. ' = ' .. tostring(o[key]))
+  end
+end
 
 --
 -- Handlers for commands

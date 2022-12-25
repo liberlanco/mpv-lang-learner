@@ -161,11 +161,35 @@ On Windows
 
 ## Configuration
 
+### Global configuration
+
 Look at `lang-learner.conf` as example and description of options.
-You have to set at least `learn` and `know` variables to languages
-you want to learn and already know.
+Place it in mpv script opts path as in `Installation` section. Set at
+least `learn` and `know` variables to languages you want to learn and
+already know.
+
+### Per folder configuration
+
+It's possible to do per-folder configuration to overwrite global
+script settings. In case when you want to learn 2 languages at the same time.
+For this enable `use-filedir-conf` in your global `~/.config/mpv/mpv.conf`.
+
+Then place new local config `mpv.conf` in local folder. It can be like this:
+```conf
+# here is how to look for subtitle files in nested dirs
+sub-file-paths=sub:subs:Subtitles
+
+# use audio track for Spanish by default
+slang=spa
+
+# overwrite script target language to Spanish and known language to Germany
+script-opts="lang-learner-learn=spa,lang-learner-know=ger"
+```
 
 ## Possible problems
+
+Common debugging helper: run `mpv -v ...` and look for lines that
+starts with `[lang_learner] ....`.
 
 * **keybindings doesn't work**. It means script is not loaded.
 

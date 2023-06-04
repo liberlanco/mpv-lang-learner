@@ -120,7 +120,7 @@ end
 function do_store(tag)
   local sub = get_sub()
   if sub == nil then return; end
-  sub['source'] = mp.get_property('filename')
+  sub['source'] = mp.get_property('path')
 
   local dir = o['store_dir']
   if dir == "" or dir == nil then return; end

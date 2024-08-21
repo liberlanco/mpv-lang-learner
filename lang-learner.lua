@@ -306,13 +306,21 @@ function save_audio(filename, sub)
     return
   end
 
+  -- Get the currently selected audio track ID from MPV
+  local audio_track_id = mp.get_property("aid")
+
+  -- Map the audio track ID to ffmpeg format (e.g., if aid=2, use "0:a:1" in ffmpeg)
+  local ffmpeg_audio_track = string.format("0:a:%d", tonumber(audio_track_id) - 1)
+
+  -- Run the ffmpeg command with the correct audio track
   mp.commandv("run", ffmpeg, "-y",
               "-loglevel", "error",
               "-i", sub['source'],
+              "-map", ffmpeg_audio_track,  -- Use the currently selected audio track
               "-ss", sub['start'], "-t", duration,
               "-vn", "-ar", "44100", "-ac", "2",
               "-ab", "192k", "-f", "mp3", filename)
-  print("saved audion to " .. filename)
+  print("saved audio to " .. filename)
 end
 
 local ffmpeg_path = nil

@@ -230,10 +230,11 @@ function set_ab_loop()
 
   local a = mp.get_property("sub-start")
   local b = mp.get_property("sub-end")
+  local delay = mp.get_property_native("sub-delay")
   if a == nil or b == nil then return; end
 
-  mp.set_property("ab-loop-a", a)
-  mp.set_property("ab-loop-b", b)
+  mp.set_property("ab-loop-a", a+delay)
+  mp.set_property("ab-loop-b", b+delay)
 end
 
 function set_slang(tag)
